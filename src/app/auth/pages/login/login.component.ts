@@ -37,7 +37,6 @@ export class LoginComponent {
           Swal.fire('Error', ok, 'error')
         }
       });
-
   }
 
 }
