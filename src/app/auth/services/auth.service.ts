@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, of, tap } from 'rxjs';
+import { catchError, map, of, tap, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, User } from '../interfaces/auth.interface';
 
@@ -25,11 +25,9 @@ export class AuthService {
 
     return this.http.post<AuthResponse>(url, body)
       .pipe(
-        tap(({ name, id, token }) => {
-          localStorage.setItem('token', token!)
-          this._user = {
-            name: name!,
-            id: id!
+        tap(resp => {
+          if (resp) {
+            localStorage.setItem('token', resp.token!)
           }
         }),
         map(valid => valid.ok),
@@ -37,13 +35,29 @@ export class AuthService {
       )
   }
 
-  validateToken() {
+  validateToken(): Observable<boolean> {
 
     const url = `${this.baseUrl}/auth/renew`;
     const headers = new HttpHeaders()
       .set('x-token', localStorage.getItem('token') || '');
 
-    return this.http.get(url, { headers })
+    return this.http.get<AuthResponse>(url, { headers })
+      .pipe(
+        map(resp => {
+
+          console.log('VALIDATETOKEN', resp.token);
+
+          localStorage.setItem('token', resp.token!)
+          this._user = {
+            name: resp.name!,
+            id: resp.userId!,
+            email: resp.email!
+          }
+
+          return resp.ok;
+        }),
+        catchError(error => of(false))
+      )
 
   }
 }
