@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -16,6 +18,8 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  errorMessage: string = '';
+
   constructor(private formBuilder: FormBuilder,
     private router: Router,
     private authService: AuthService) { }
@@ -27,10 +31,10 @@ export class LoginComponent {
       .subscribe(ok => {
         console.log(ok)
 
-        if (ok) {
+        if (ok === true) {
           this.router.navigateByUrl('/dashboard');
         } else {
-          //TODO
+          Swal.fire('Error', ok, 'error')
         }
       });
 

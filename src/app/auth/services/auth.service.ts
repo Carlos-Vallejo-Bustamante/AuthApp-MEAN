@@ -32,7 +32,7 @@ export class AuthService {
           }
         }),
         map(valid => valid.ok),
-        catchError(error => of(false))
+        catchError(error => of(error.error.msg))
       )
   }
 }
