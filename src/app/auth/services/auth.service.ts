@@ -25,12 +25,12 @@ export class AuthService {
 
     return this.http.post<AuthResponse>(url, body)
       .pipe(
-        tap(resp => {
-          if (resp) {
-            localStorage.setItem('token', resp.token!)
+        tap(({ ok, token }) => {
+          if (ok) {
+            localStorage.setItem('token', token!)
           }
         }),
-        map(valid => valid.ok),
+        map(({ ok }) => ok),
         catchError(error => of(error.error.msg))
       )
 
